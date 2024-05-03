@@ -1,0 +1,24 @@
+{
+  "name": "backend_1st_project",
+  "version": "1.0.0",
+  "description": "My first backend project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Souradip Saha",
+  "license": "ISC",
+  "type": "module",
+  "keywords": [
+    "javascript",
+    "backend",
+    "express"
+  ],
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.3.3"
+  }
+}
