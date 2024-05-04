@@ -8,7 +8,6 @@ cloudinary.config({
 });
 
 // localFilePath is a parameter for the uploadCloudinary function. It represents the path to a file stored on the local file system that you want to upload to Cloudinary.
-
 const uploadCloudinary = async (localFilePath) => {
   try{
     if(!localFilePath) return null;
