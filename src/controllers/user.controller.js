@@ -5,11 +5,6 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler(async (req, res) => {
-  /*
-  res.status(200).json({
-    success: true,
-    message: "ok"
-  })*/
 
   // get user details from frontend
   // validation - not empty
@@ -28,7 +23,9 @@ const registerUser = asyncHandler(async (req, res) => {
   if ([fullName, email, username, password].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "All fields are required");
   }
-  // this.username = username.toLowerCase();
+
+  // if(username) req.body.username = username.toLowerCase();
+
   const existingUser = await User.findOne({
     $or: [{username}, {email}]
   });
@@ -37,17 +34,25 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "user with email or username already exists");
   }
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImagePath = req.files?.coverImage[0]?.path;
+  // const avatarLocalPath = req.files?.avatar[0]?.path;
+  // const coverImagePath = req.files?.coverImage[0]?.path;
+  // console.log(req.files.coverImage.length); // cannot read properties of undefined
 
-  // console.log(avatarLocalPath);
-
-  if (!avatarLocalPath) {
+  let avatarLocalPath;
+  if (req.files && Array.isArray(req.files.avatar) && (req.files.avatar.length > 0)) {
+    avatarLocalPath = req.files.avatar[0].path;
+  } else {
     throw new ApiError(400, "Avatar file required");
+  }
+
+  let coverImagePath;
+  if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+    coverImagePath = req.files.coverImage[0].path;
   }
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = await uploadOnCloudinary(coverImagePath);
+  // console.log(avatar);
 
   if (!avatar) {
     throw new ApiError(400, "Avatar file not uploaded to cloudinary");
