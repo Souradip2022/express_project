@@ -55,12 +55,12 @@ userSchema.pre("save", async function (next) {
   next();
 })
 
-userSchema.method.isPasswordCorrect = async function (password) {
+userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
 userSchema.methods.generateAccessToken = function () {
-  jwt.sign({
+  return  jwt.sign({
       _id: this._id,
       username: this.username,
       password: this.password,
@@ -72,8 +72,8 @@ userSchema.methods.generateAccessToken = function () {
     })
 }
 
-userSchema.method.generateRefreshToken = function () {
-  jwt.sign(
+userSchema.methods.generateRefreshToken = function () {
+    jwt.sign(
     {
       _id: this._id,
     },
@@ -85,7 +85,6 @@ userSchema.method.generateRefreshToken = function () {
 }
 
 export const User = model("User", userSchema);
-
 
 /*
 import crypto from "crypto";
