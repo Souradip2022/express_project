@@ -12,11 +12,11 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
     const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
-    await user.save({validateBeforeSave: false});
+    await user.save({validateBeforeSave: true});
 
     return {accessToken, refreshToken};
   } catch (error) {
-    throw new ApiError(500, "Something went wrong while generating referesh and access token")
+    throw new ApiError(500, "Something went wrong while generating refresh and access token");
   }
 }
 
@@ -91,7 +91,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Something went wrong while registering user");
   }
 
-  return res.status(201).json(new ApiResponse(200, createdUser, "User registered Successfully"));
+  return res.status(200).json(new ApiResponse(200, createdUser, "User registered Successfully"));
 });
 
 
@@ -132,10 +132,10 @@ const loginUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: true
   }
-  // console.log(refreshToken, accessToken)
+  // console.log(refreshToken,"\n\n", accessToken)
 
-  res.header("X-User", `${username}`)
-    .header("Authorization", `Bearer ${accessToken}`);
+  /*res.header("X-User", `${username}`)
+    .header("Authorization", `Bearer ${accessToken}`);*/
 
   return res.status(200)
     .cookie("accessToken", accessToken, option)
@@ -151,31 +151,33 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
+
 const logoutUser = asyncHandler(async (req, res) => {
-  await User.findOneAndReplace(
+  await User.findByIdAndUpdate(
     req.user._id,
     {
       $unset: {
-        refreshToken: 1
-      },
+        refreshToken: 1 // this removes the field from document
+      }
     },
     {
       new: true
     }
-  );
+  )
 
   const option = {
     httpOnly: true,
     secure: true
   }
 
-  res.removeHeader("Authorization");
+  // res.removeHeader("Authorization");
 
   return res.status(200)
     .clearCookie("accessToken", option)
     .clearCookie("refreshToken", option)
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
+
 
 const refreshTokenGenerator = asyncHandler(async (req, res) => {
 
@@ -209,7 +211,7 @@ const refreshTokenGenerator = asyncHandler(async (req, res) => {
       secure: true
     }
 
-    res.status(200)
+    return res.status(200)
       .cookie("accessToken", accessToken, option)
       .cookie("refreshToken", newRefreshToken, option)
       .json(
@@ -219,7 +221,7 @@ const refreshTokenGenerator = asyncHandler(async (req, res) => {
       );
 
   } catch (error) {
-    throw new ApiResponse(400, error.message || "Something went wrong");
+    throw new ApiError(400, error.message || "Something went wrong");
   }
 })
 
