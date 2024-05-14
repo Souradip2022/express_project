@@ -1,7 +1,7 @@
 import {asyncHandler} from "../utils/AsyncHandler.js";
 import {ApiError} from "../utils/ApiError.js";
 import {User} from "../models/users.model.js";
-import {uploadOnCloudinary} from "../utils/cloudinary.js";
+import {deleteFromCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 
@@ -69,7 +69,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = await uploadOnCloudinary(coverImagePath);
-  // console.log(avatar);
+  // console.log(avatar.url);
 
   if (!avatar) {
     throw new ApiError(400, "Avatar file not uploaded to cloudinary");
@@ -299,6 +299,18 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Avatar image file not found");
   }
 
+  const userPrevAvatar = await User.findById(req.user?._id).select("avatar");
+
+  if(!userPrevAvatar){
+    throw new ApiError(500, "Error while fetching prevAvatar url");
+  }
+
+  const previousAvatarPublicId =  userPrevAvatar.avatar.split("/").pop().split(".")[0];
+  const response = await deleteFromCloudinary(previousAvatarPublicId);
+  if(!response){
+    throw new ApiError(500, "Previous avatar image deletion failed");
+  }
+
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   if (!avatar) {
     throw new ApiError(400, "Could not upload avatar image to cloudinary");
@@ -331,6 +343,17 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Cover image file not found");
   }
 
+  const userPrevCoverImage = await User.findById(req.user?._id).select("coverImage");
+  if(!userPrevCoverImage){
+    throw new ApiError(500, "Error while fetching prevAvatar url");
+  }
+
+  const previousCoverImagePublicId =  userPrevCoverImage.coverImage.split("/").pop().split(".")[0];
+  const response = await deleteFromCloudinary(previousCoverImagePublicId);
+  if(!response){
+    throw new ApiError(500, "Previous avatar image deletion failed");
+  }
+
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
   if (!coverImage) {
     throw new ApiError(400, "Could not upload cover image image to cloudinary");
@@ -352,7 +375,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
   return res.status(200)
     .json(new ApiResponse(200, {user}, "Updated cover image successfully"));
-})
+});
 
 export {
   registerUser,
