@@ -225,4 +225,28 @@ const refreshTokenGenerator = asyncHandler(async (req, res) => {
   }
 })
 
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+
+  const {oldPassword, newPassword} = req.body;
+
+  if (!oldPassword || !newPassword || [oldPassword, newPassword].some((field) => field.trim() !== "")) {
+    throw new ApiError(400, "All fields required");
+  }
+
+  const user = await User.findById(req?._id);
+  if (!user) {
+    throw new ApiError(400, "Invalid user");
+  }
+
+  if (!await user.isPasswordCorrect(oldPassword)) {
+    throw new ApiError(400, "Incorrect user credentials");
+  } else {
+    user.password = newPassword;
+    user.save({validateBeforeSave: false});
+  }
+
+  return res.status(200)
+    .json(new ApiResponse(200, {}, "Password updated successfully"));
+})
+
 export {registerUser, loginUser, logoutUser, refreshTokenGenerator};
