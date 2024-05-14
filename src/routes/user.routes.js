@@ -5,7 +5,7 @@ import {
   loginUser,
   logoutUser,
   refreshTokenGenerator,
-  registerUser,
+  registerUser, updateAccountDetails,
 } from "../controllers/user.controller.js";
 import {verifyJWT} from "../middlewares/auth.middleware.js";
 
@@ -33,5 +33,7 @@ router.route("/refresh-token").post(refreshTokenGenerator);
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 
 router.route("/get-user").post(verifyJWT, getCurrentUser);
+
+router.route("/update-account").patch(verifyJWT, updateAccountDetails);
 
 export default router;
