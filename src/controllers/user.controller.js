@@ -291,6 +291,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     );
 });
 
+
 const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path;
 
@@ -313,7 +314,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     {new: true}
   ).select("-password -refreshToken");
 
-  if(!user){
+  if (!user) {
     throw new ApiError(500, "Could not update avatar url in database");
   }
 
@@ -321,6 +322,37 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {user}, "Updated avatar image successfully"));
 
 });
+
+
+const updateUserCoverImage = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file?.path;
+
+  if (!coverImageLocalPath) {
+    throw new ApiError(400, "Cover image file not found");
+  }
+
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  if (!coverImage) {
+    throw new ApiError(400, "Could not upload cover image image to cloudinary");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        coverImage: coverImage.url
+      }
+    },
+    {new: true}
+  ).select("-password -refreshToken");
+
+  if (!user) {
+    throw new ApiError(500, "Could not update cover image url in database");
+  }
+
+  return res.status(200)
+    .json(new ApiResponse(200, {user}, "Updated cover image successfully"));
+})
 
 export {
   registerUser,
@@ -330,5 +362,6 @@ export {
   changeCurrentPassword,
   getCurrentUser,
   updateAccountDetails,
-  updateUserAvatar
+  updateUserAvatar,
+  updateUserCoverImage
 };
