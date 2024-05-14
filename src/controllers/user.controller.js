@@ -274,7 +274,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Incorrect user credentials");
   }
 
-  const updatedUser =  await User.findByIdAndUpdate(
+  const updatedUser = await User.findByIdAndUpdate(
     user._id,
     {
       $set: {
@@ -291,6 +291,37 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     );
 });
 
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar image file not found");
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  if (!avatar) {
+    throw new ApiError(400, "Could not upload avatar image to cloudinary");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatar.url
+      }
+    },
+    {new: true}
+  ).select("-password -refreshToken");
+
+  if(!user){
+    throw new ApiError(500, "Could not update avatar url in database");
+  }
+
+  return res.status(200)
+    .json(new ApiResponse(200, {user}, "Updated avatar image successfully"));
+
+});
+
 export {
   registerUser,
   loginUser,
@@ -298,5 +329,6 @@ export {
   refreshTokenGenerator,
   changeCurrentPassword,
   getCurrentUser,
-  updateAccountDetails
+  updateAccountDetails,
+  updateUserAvatar
 };
