@@ -249,4 +249,10 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password updated successfully"));
 })
 
-export {registerUser, loginUser, logoutUser, refreshTokenGenerator};
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshTokenGenerator,
+  changeCurrentPassword
+};
