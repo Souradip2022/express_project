@@ -229,11 +229,11 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
   const {oldPassword, newPassword} = req.body;
 
-  if (!oldPassword || !newPassword || [oldPassword, newPassword].some((field) => field.trim() !== "")) {
+  if (!oldPassword || !newPassword || [oldPassword, newPassword].some((field) => field.trim() === "")) {
     throw new ApiError(400, "All fields required");
   }
 
-  const user = await User.findById(req?._id);
+  const user = await User.findById(req.user?._id);
   if (!user) {
     throw new ApiError(400, "Invalid user");
   }
@@ -257,11 +257,46 @@ const getCurrentUser = asyncHandler(async (req, res) =>
 );
 
 
+const updateAccountDetails = asyncHandler(async (req, res) => {
+
+  const {fullName, email, password} = req.body;
+
+  if (!fullName || !email || !password || [fullName, email, password].some(field => field.trim() === "")) {
+    throw new ApiError(400, "All fields required");
+  }
+
+  const user = await User.findById(req.user?._id);
+  if (!user) {
+    throw new ApiError(400, "Invalid user");
+  }
+
+  if (!await user.isPasswordCorrect(password)) {
+    throw new ApiError(400, "Incorrect user credentials");
+  }
+
+  const updatedUser =  await User.findByIdAndUpdate(
+    user._id,
+    {
+      $set: {
+        fullName,
+        email
+      }
+    },
+    {new: true}
+  ).select("-password -refreshToken");
+
+  return res.status(200)
+    .json(
+      new ApiResponse(200, {updatedUser}, "Account details updated successfully")
+    );
+});
+
 export {
   registerUser,
   loginUser,
   logoutUser,
   refreshTokenGenerator,
   changeCurrentPassword,
-  getCurrentUser
+  getCurrentUser,
+  updateAccountDetails
 };
