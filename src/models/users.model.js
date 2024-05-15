@@ -6,28 +6,30 @@ const userSchema = new Schema(
   {
     username: {
       type: String,
-      required: true,
+      required: [true , "username is required"],
       unique: true,
       lowercase: true,
       trim: true,
-      index: true //Should be used only with specific keys because it decreases performance
+      index: true, //Should be used only with specific keys because it decreases performance
+      minLength: 4,
+      maxlength: 20
     },
     email: {
       type: String,
-      required: true,
+      required: [true , "email is required"],
       unique: true,
-      lowecase: true,
+      lowercase: true,
       trim: true,
     },
     fullName: {
       type: String,
-      required: true,
+      required: [true , "fullname is required"],
       trim: true,
       index: true
     },
     avatar: {
       type: String, // cloudinary url
-      required: true,
+      required: [true , "avatar is required"],
     },
     coverImage: {
       type: String, // cloudinary url

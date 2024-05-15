@@ -301,13 +301,13 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
   const userPrevAvatar = await User.findById(req.user?._id).select("avatar");
 
-  if(!userPrevAvatar){
+  if (!userPrevAvatar) {
     throw new ApiError(500, "Error while fetching prevAvatar url");
   }
 
-  const previousAvatarPublicId =  userPrevAvatar.avatar.split("/").pop().split(".")[0];
+  const previousAvatarPublicId = userPrevAvatar.avatar.split("/").pop().split(".")[0];
   const response = await deleteFromCloudinary(previousAvatarPublicId);
-  if(!response){
+  if (!response) {
     throw new ApiError(500, "Previous avatar image deletion failed");
   }
 
@@ -344,15 +344,13 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   }
 
   const userPrevCoverImage = await User.findById(req.user?._id).select("coverImage");
-  if(!userPrevCoverImage){
+  if (!userPrevCoverImage) {
     throw new ApiError(500, "Error while fetching prevAvatar url");
   }
 
-  const previousCoverImagePublicId =  userPrevCoverImage.coverImage.split("/").pop().split(".")[0];
-  const response = await deleteFromCloudinary(previousCoverImagePublicId);
-  if(!response){
-    throw new ApiError(500, "Previous avatar image deletion failed");
-  }
+  const previousCoverImagePublicId = userPrevCoverImage.coverImage.split("/").pop().split(".")[0];
+
+  await deleteFromCloudinary(previousCoverImagePublicId); // null is returned if previously no cover image was present
 
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
   if (!coverImage) {
