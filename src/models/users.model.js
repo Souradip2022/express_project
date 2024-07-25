@@ -1,4 +1,4 @@
-import mongoose, {Schema, model} from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -6,30 +6,30 @@ const userSchema = new Schema(
   {
     username: {
       type: String,
-      required: [true , "username is required"],
+      required: [true, "username is required"],
       unique: true,
       lowercase: true,
       trim: true,
       index: true, //Should be used only with specific keys because it decreases performance
       minLength: 4,
-      maxlength: 20
+      maxlength: 20,
     },
     email: {
       type: String,
-      required: [true , "email is required"],
+      required: [true, "email is required"],
       unique: true,
       lowercase: true,
       trim: true,
     },
     fullName: {
       type: String,
-      required: [true , "fullname is required"],
+      required: [true, "fullname is required"],
       trim: true,
-      index: true
+      index: true,
     },
     avatar: {
       type: String, // cloudinary url
-      required: [true , "avatar is required"],
+      required: [true, "avatar is required"],
     },
     coverImage: {
       type: String, // cloudinary url
@@ -37,18 +37,19 @@ const userSchema = new Schema(
     watchHistory: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Video"
-      }
+        ref: "Video",
+      },
     ],
     password: {
       type: String,
-      required: [true, 'Password is required']
+      required: [true, "Password is required"],
     },
     refreshToken: {
-      type: String
-    }
-
-  }, {timestamps: true})
+      type: String,
+    },
+  },
+  { timestamps: true },
+);
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
@@ -62,16 +63,18 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-  return jwt.sign({
+  return jwt.sign(
+    {
       _id: this._id,
       username: this.username,
       password: this.password,
-      fullName: this.fullName
+      fullName: this.fullName,
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY
-    })
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    },
+  );
 };
 
 userSchema.methods.generateRefreshToken = function () {
@@ -81,9 +84,9 @@ userSchema.methods.generateRefreshToken = function () {
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRY
-    }
-  )
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    },
+  );
 };
 
 export const User = model("User", userSchema);
@@ -95,4 +98,3 @@ const key1 = crypto.randomBytes(32).toString("hex");
 const key2 = crypto.randomBytes(32).toString("hex");
 console.table([key1, key2]);
 */
-

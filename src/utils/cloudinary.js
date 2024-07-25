@@ -1,10 +1,10 @@
-import {v2 as cloudinary} from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET
+  api_secret: process.env.API_SECRET,
 });
 
 // localFilePath is a parameter for the uploadCloudinary function. It represents the path to a file stored on the local file system that you want to upload to Cloudinary.
@@ -13,7 +13,7 @@ const uploadOnCloudinary = async (localFilePath) => {
     if (!localFilePath) return null;
 
     const uploadResponse = await cloudinary.uploader.upload(localFilePath, {
-      resource_type: "auto"
+      resource_type: "auto",
     });
 
     console.log("File upload successfully on cloudinary ", uploadResponse.url);
@@ -27,17 +27,18 @@ const uploadOnCloudinary = async (localFilePath) => {
     fs.unlinkSync(localFilePath);
     return null;
   }
-}
+};
 
 const deleteFromCloudinary = async (fileUrlID) => {
   try {
     if (!fileUrlID) return null;
 
-    return await cloudinary.uploader.destroy(fileUrlID, {resource_type: "auto"});
+    return await cloudinary.uploader.destroy(fileUrlID, {
+      resource_type: "auto",
+    });
   } catch (error) {
-    console.warn("File deletion failed !! ", error)
+    console.warn("File deletion failed !! ", error);
   }
-}
+};
 
-
-export {uploadOnCloudinary, deleteFromCloudinary};
+export { uploadOnCloudinary, deleteFromCloudinary };

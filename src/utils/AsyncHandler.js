@@ -4,12 +4,11 @@ const asyncHandler = (requestHandler) => async (req, res, next) => {
   } catch (err) {
     res.status(err.code || 500).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
 
     console.warn(err.message);
   }
 };
 
-export {asyncHandler};
-
+export { asyncHandler };

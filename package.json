@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
+    "pretty": "prettier --write .",
+    "prepare": "husky"
   },
   "author": "Souradip Saha",
   "license": "ISC",
@@ -26,9 +28,11 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
+    "husky": "^9.1.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.3",
     "mongoose-aggregate-paginate-v2": "^1.0.7",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "prettier": "^3.3.3"
   }
 }
